@@ -1,0 +1,9 @@
+<h1>Remove Student from Class: {{ clazz.name }}</h1>
+
+<p>Do you want to remove {{ student }} from class: {{ clazz.name }}?</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Yes</button>
+  <a href="{% url 'main_app:admin_class_detail' clazz_id=clazz.id %}">No</a>
+</form>

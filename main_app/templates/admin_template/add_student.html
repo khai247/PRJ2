@@ -1,0 +1,21 @@
+{% extends 'admin_template/admin_base.html' %}
+
+{% block content %}
+  <h1 style="color: #333;">Add Student</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    {{ image_form.as_p }} <!-- Add the image form here -->
+    <button type="submit" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; cursor: pointer;">Add Student</button>
+  </form>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  
+{% endblock %}

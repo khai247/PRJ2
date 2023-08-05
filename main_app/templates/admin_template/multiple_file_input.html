@@ -1,0 +1,24 @@
+{% load static %}
+
+<div class="multiple-file-input">
+  <input type="file" name="{{ widget.name }}[]" class="{{ widget.css_classes }}" id="{{ widget.attrs.id }}_add" multiple>
+  <label for="{{ widget.attrs.id }}_add">Add files</label>
+  <ul class="selected-files"></ul>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const inputElement = document.querySelector('.multiple-file-input input[type="file"]');
+  const selectedFilesElement = document.querySelector('.multiple-file-input .selected-files');
+
+  inputElement.addEventListener('change', function () {
+    selectedFilesElement.innerHTML = '';
+
+    for (const file of inputElement.files) {
+      const listItem = document.createElement('li');
+      listItem.textContent = file.name;
+      selectedFilesElement.appendChild(listItem);
+    }
+  });
+});
+</script>

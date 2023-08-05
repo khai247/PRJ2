@@ -1,0 +1,200 @@
+{% extends 'staff_template/staff_base.html' %}
+
+{% block content %}
+  <style>
+  #videoContainer {
+    display: flex;
+  }
+  
+  #videoCanvas {
+    margin-right: 10px;
+  }
+
+  #resultsPanel {
+    width: 400px;
+    border: 1px solid black;
+    padding: 10px;
+  }
+
+  </style>
+
+  <title>Video Capture</title>
+  <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+
+  <h1>Video Capture</h1>
+  <div id="videoContainer">
+    <canvas id="videoCanvas" width="640" height="480"></canvas>
+    <div id="resultsPanel"></div>
+  </div>
+  <button id="startButton">Start Recording</button>
+  <button id="stopButton">Stop Recording</button>
+
+  <script>
+    // Variables for capturing video and processing frames
+    var videoElement;
+    var canvas;
+    var context;
+    var isRecording = false;
+    var frameDelay = 3000;
+    var lastFrameTime = 0;
+    var clazzId = "{{ clazz_id }}";
+
+    // Function to be called when OpenCV is ready
+    function onOpenCvReady() {
+      // Get the video canvas element
+      canvas = document.getElementById("videoCanvas");
+      context = canvas.getContext("2d");
+
+      // Get the results panel element
+      var resultsPanel = document.getElementById("resultsPanel");
+
+      // Get the start and stop buttons
+      var startButton = document.getElementById("startButton");
+      var stopButton = document.getElementById("stopButton");
+
+      // Function to start recording
+      function startRecording() {
+        // Create a video element dynamically
+        videoElement = document.createElement("video");
+        videoElement.autoplay = true;
+
+        // Start capturing video from the camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function(stream) {
+            // Set the video source
+            videoElement.srcObject = stream;
+
+            // Wait for the video metadata to load and then start processing frames
+            videoElement.onloadedmetadata = function() {
+              // Set the canvas size to match the video dimensions
+              canvas.width = videoElement.videoWidth;
+              canvas.height = videoElement.videoHeight;
+
+              // Start processing frames
+              processVideo();
+              isRecording = true;
+              startButton.disabled = true;
+              stopButton.disabled = false;
+            };
+          })
+          .catch(function(error) {
+            console.log("Error accessing camera: ", error);
+          });
+      }
+
+      // Function to stop recording
+      function stopRecording() {
+        // Stop capturing video
+        videoElement.srcObject.getTracks().forEach(function(track) {
+          track.stop();
+        });
+        videoElement.srcObject = null;
+
+        // Clean up the canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Reset the recording state and enable the start button
+        isRecording = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+      }
+
+      // Start button event listener
+      startButton.addEventListener("click", startRecording);
+
+      // Stop button event listener
+      stopButton.addEventListener("click", stopRecording);
+
+      // Function to process video frames
+      function processVideo() {
+        // Only process frames if recording is enabled
+        if (isRecording) {
+          // Get the current video frame
+          context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+          // Perform image processing using OpenCV.js
+          // ...
+
+          // Display the processed frame
+          context.putImageData(imageData, 0, 0);
+
+          // Send the frame to the server for face recognition
+          var currentTime = Date.now()
+          if (currentTime - lastFrameTime >= frameDelay) {
+              sendFrameToServer(imageData);
+              lastFrameTime = currentTime;
+          }
+        }  
+        // Request the next frame
+        requestAnimationFrame(processVideo);
+      }
+
+      // Function to send the frame to the server for face recognition
+      function sendFrameToServer(imageData) {
+        // Convert the ImageData to a Blob
+        var canvas = document.createElement("canvas");
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        var context = canvas.getContext("2d");
+        context.putImageData(imageData, 0, 0);
+        canvas.toBlob(function(blob) {
+          // Create a FormData object and append the Blob
+          var formData = new FormData();
+          formData.append("image", blob, "frame.png");
+          formData.append('clazz_id', clazzId)
+
+          // Create an XMLHttpRequest object
+          var xhr = new XMLHttpRequest();
+
+          // Configure the request
+          xhr.open("POST", "/recognize_faces/");
+          xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+
+          // Set the callback function when the request is complete
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              var response = JSON.parse(xhr.responseText);
+              // Process the response from the server
+              displayResults(response);
+            } else {
+              console.log("Request failed. Status:", xhr.status);
+            }
+          };
+
+          // Send the request
+          xhr.send(formData);
+        });
+      }
+
+      // Function to display the results in the results panel
+      function displayResults(response) {
+        var resultsHtml = "<h3>Face Recognition Results</h3>";
+
+        // Check if both student_results and status_results exist in the response
+        if (response.student_results && response.status_results) {
+          // Create the table
+          resultsHtml += "<table><tr><th>Name</th><th>Status</th></tr>";
+
+          // Iterate over the student_results and status_results arrays
+          for (var i = 0; i < response.student_results.length; i++) {
+            var name = response.student_results[i];
+            var status = response.status_results[i];
+
+            // Add a new row to the table
+            resultsHtml += "<tr><td>" + name + "</td><td>" + status + "</td></tr>";
+          }
+
+          // Close the table
+          resultsHtml += "</table>";
+        } else {
+          resultsHtml += "<p>No results found.</p>";
+        }
+
+        // Get the results panel element and set the HTML content
+        var resultsPanel = document.getElementById("resultsPanel");
+        resultsPanel.innerHTML = resultsHtml;
+      }
+    }
+  </script>
+{% endblock %}

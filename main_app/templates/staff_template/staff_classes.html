@@ -1,0 +1,39 @@
+<!-- staff_template/staff_home.html -->
+{% extends 'staff_template/staff_base.html' %}
+
+{% block content %}
+<h1>Welcome, {{ request.user.staff }}!</h1>
+<form method="GET" action="">
+    <label for="semester">Filter by Semester:</label>
+    <select name="semester" id="semester">
+        <option value="">All</option>
+        {% for semester in semesters %}
+            <option value="{{ semester }}" {% if semester == selected_semester %}selected{% endif %}>{{ semester }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<br>
+<table>
+    <tr>
+        <th>STT</th>
+        <th>Học phần</th>
+        <th>Lịch học</th>
+        <th>Địa điểm</th>
+        <th>Số sinh viên</th>
+    </tr>
+    {% for clazz in classes %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><a href="{% url 'main_app:class_details' clazz.pk %}">{{ clazz.name }}</a></td>
+        <td>{{ clazz.schedule }}</td>
+        <td>{{ clazz.place }}</td>
+        <td>{{ clazz.students.count }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No classes found</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'student_template/student_base.html' %}
+
+{% block styles %}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    h2 {
+      color: #666;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Student Homepage</h1>
+  
+  
+  <h2>Subjects</h2>
+  <table>
+    <tr>
+      <th>Subject</th>
+      <th>Present</th>
+      <th>Absent</th>
+    </tr>
+    {% for subject, present, absent in subject_data %}
+      <tr>
+        <td>{{ subject }}</td>
+        <td>{{ present }}</td>
+        <td>{{ absent }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

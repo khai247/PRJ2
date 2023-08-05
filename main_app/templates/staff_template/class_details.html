@@ -1,0 +1,28 @@
+
+{% extends 'staff_template/staff_base.html' %}
+
+{% block content %}
+<h1>Class Details - {{ clazz.name }}</h1>
+
+<button onclick="window.location.href='{% url 'main_app:take_attendance' clazz.pk %}'">Điểm danh</button>
+
+<table>
+    <tr>
+        <th>STT</th>
+        <th>Họ tên</th>
+        <th>Số buổi vắng</th>
+    </tr>
+    {% for sa in student_attendance %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ sa.student.admin.last_name }} {{ sa.student.admin.first_name }}</td>
+        <td>{{ sa.attendance_count }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">Lớp chưa có học sinh tham gia.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

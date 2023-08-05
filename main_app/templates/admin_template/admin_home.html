@@ -1,0 +1,12 @@
+<!-- admin_template/admin_home.html -->
+{% extends 'admin_template/admin_base.html' %}
+
+{% block content %}
+  <h1 style="color: #333;">Administrative Dashboard</h1>
+
+  <h2 style="color: #666; margin-top: 40px;">Statistics</h2>
+  <p style="color: #333; margin-bottom: 10px;">Total Students: {{ total_students }}</p>
+  <p style="color: #333; margin-bottom: 10px;">Total Teachers: {{ total_teacher }}</p>
+  <p style="color: #333; margin-bottom: 10px;">Total Subjects: {{ total_subject.count }}</p>
+{% endblock %}
+   

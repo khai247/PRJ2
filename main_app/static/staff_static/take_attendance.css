@@ -1,0 +1,64 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#videoContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#videoCanvas {
+  border: 1px solid #ccc;
+  max-width: 100%;
+}
+
+#resultsPanel {
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+#resultsPanel h3 {
+  margin-top: 0;
+}
+
+#resultsPanel ul {
+  padding-left: 20px;
+}
+
+#resultsPanel li {
+  margin-bottom: 5px;
+}
+
+#resultsPanel p {
+  margin: 0;
+}
+
+#buttonsContainer {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

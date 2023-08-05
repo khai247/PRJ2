@@ -1,0 +1,54 @@
+{% extends 'admin_template/admin_base.html' %}
+{% block content %}
+  <h1>Quản lí giảng viên</h1>
+
+  <a href="{% url 'main_app:add_staff' %}">Add teacher</a>
+  
+  <form method="GET">
+    <input type="text" name="search_query" placeholder="Search by Teacher ID" value="{{ search_query }}">
+    <button type="submit">Search</button>
+  </form>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Họ tên</th>
+        <th>Mã giáo viên</th>
+        <th>Giới tính</th>
+        <th>Email</th>
+        <th>Xóa</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for staff in staffs %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ staff.admin.last_name }} {{ staff.admin.first_name }}</td>
+          <td>{{ staff.staff_id }}</td>
+          <td>{{ staff.admin.gender }}</td>
+          <td>{{ staff.admin.email }}</td>
+          <td>
+            <form method="POST" action="{% url 'main_app:delete_staff' staff.staff_id %}">
+              {% csrf_token %}
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>  
+      {% empty %}
+        <tr>
+          <td colspan="6">No staffs found</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  
+{% endblock %}
